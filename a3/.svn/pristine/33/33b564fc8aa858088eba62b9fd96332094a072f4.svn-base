@@ -1,0 +1,21 @@
+CSCC69 A3 Design Document (Group 20)
+
+===============================================================================
+1. Explain how your open file table design supports the fork semantics.
+
+The open file table design supports the fork semantics in the reading, writing
+and file close functions.
+
+When forking, the child process and the parent process will have the same
+copy of the file table, therefore synchronization is required for when the
+read and write functions are called by the parent or child. Our open file
+table design uses locks, a lock is set prior to an operation and then released
+when the operation on the file is complete.
+
+When forking, multiple processes can refer to the file, so each open file 
+struct in the open file table has a reference count attribute, which 
+represents the number of processes currently using the file. This prevents any
+one process from closing and removing the file from the table while other
+processes are still using it.
+
+===============================================================================

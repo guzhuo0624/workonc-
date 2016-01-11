@@ -1,0 +1,33 @@
+CSCC69 A3 Design Document (Group 20)
+
+===============================================================================
+1. Explain how your open file table design supports the fork semantics.
+
+The open file table design supports the fork semantics in the reading, writing
+and file close functions.
+
+When forking, the child process and the parent process will have the same
+copy of the file table, therefore synchronization is required for when the
+read and write functions are called by the parent or child. Our open file
+table design uses locks, a lock is set prior to an operation and then released
+when the operation on the file is complete.
+
+When forking, multiple processes can refer to the file, so each open file 
+struct in the open file table has a reference count attribute, which 
+represents the number of processes currently using the file. This prevents any
+one process from closing and removing the file from the table while other
+processes are still using it.
+
+===============================================================================
+
+2. Explain your implementation of sfs_getdirentry.
+
+Our implementation of sfs_getdirentry begins by getting the vfs lock to ensure nothing is changed while we are looking through the data.
+
+We then begin looping through each of the slots within the directory. If reading the slot fails for whatever reason, return the error it failed with. Otherwise, check to see if the slot is empty. If it is, keep checking slots and incrementing the offset until either a non-empty one is found, or we have iterated through all of the slots. If a non-empty slot is found, ensure the name of the dir entry is null terminated, and then move it into the uio object. Finally, increment the offset so we will not find this entry again the next time getdirentry is called, and release the vfs lock.
+
+===============================================================================
+
+4. Discuss the single biggest challenge you had to address for the assignment
+
+The biggest challenge we had to address was our implementation of sfs_getdirentry. The reason it was so challenging was because the implementation involved understanding many aspects of the system, across many different files. In particular, a good understanding of sfs, vnodes, and uio were crucial. It also took a while for us to figure out how to handle the behavior if the specified offset pointed to an empty slot.

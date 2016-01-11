@@ -1,0 +1,57 @@
+/* BEGIN A3 SETUP */
+/*
+ * Declarations for file handle and file table management.
+ * New for A3.
+ */
+
+#ifndef _FILE_H_
+#define _FILE_H_
+
+#include <kern/limits.h>
+
+struct vnode;
+
+/*
+ * filetable struct
+ * An array of ofile structs with a lock.
+ */
+struct filetable {
+	struct ofile *openfiles [__OPEN_MAX];
+};
+
+/*
+ * ofile struct
+ * Contains various attributes of a file, the vnode, offset, flags
+ * reference count and the file's lock.
+ */
+struct ofile {
+	struct vnode *v;
+	unsigned int offset;
+	unsigned int flags;
+	unsigned int ref_cnt;
+	struct lock *lock;
+};
+
+/* these all have an implicit arg of the curthread's filetable */
+int filetable_init(void);
+void filetable_destroy(struct filetable *ft);
+
+/* opens a file (must be kernel pointers in the args) */
+int file_open(char *filename, int flags, int mode, int *retfd);
+
+/* closes a file */
+int file_close(int fd);
+
+/* A3: You should add additional functions that operate on
+ * the filetable to help implement some of the filetable-related
+ * system calls.
+ */
+
+/* Add a ofile at the next avaliable index in filetable */
+int filetable_add(struct ofile *of, int *fd);
+/* Set the ofile argument to an ofile  from filetable at a specific index */
+int filetable_find(int fd, struct ofile **of);
+
+#endif /* _FILE_H_ */
+
+/* END A3 SETUP */

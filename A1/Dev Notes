@@ -1,0 +1,4 @@
+Set invalid pid to be detached pids parent. That way it will be dropped immediately if exited.
+
+TODO:
+-verify detach works as expected
